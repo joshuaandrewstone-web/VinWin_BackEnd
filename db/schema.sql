@@ -1,14 +1,16 @@
 CREATE TABLE IF NOT EXISTS Users (
     individualId SERIAL PRIMARY KEY,
-    username VARCHAR(50) NOT NULL,
-    email VARCHAR(100) NOT NULL,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(100) NOT NULL,
     dateCreated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS finance.Account (
+CREATE SCHEMA IF NOT EXISTS finance;
+
+CREATE TABLE IF NOT EXISTS finance.accounts (
     accountId SERIAL PRIMARY KEY,
     userId INT NOT NULL REFERENCES Users(individualId),
     balance DECIMAL(10, 2) NOT NULL,
     dateCreated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+);  

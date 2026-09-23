@@ -1,8 +1,6 @@
 import express from "express";
+import { addUser } from "../controllers/addUserController.js";
 
 export const apiRouter = express.Router();
 
-apiRouter.post("/createUser", (req, res) => {
-    console.log(req.body);
-    res.json({ message: "User creation API is working" });
-});
+apiRouter.post("/createUser", addUser);
