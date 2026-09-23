@@ -1,15 +1,25 @@
 import express from "express";
 import cors from "cors";
-import { apiRouter } from "./apiRouters/apiRoutes.js";
+import session from "express-session";
+import "dotenv/config";
+import { authRouter } from "./apiRouters/apiRoutes.js";
 
-const PORT = 8000;
+const PORT = process.env.PORT || 8000;
 
 const app = express();
 
 app.use(cors());
 
 app.use(express.json());
-app.use('/api', apiRouter);
+
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false } // Set to true if using HTTPS
+}));
+
+app.use('/api/auth', authRouter);
 
 app.use((req, res) => {
     res.status(404).json({ message: "Not Found" });
