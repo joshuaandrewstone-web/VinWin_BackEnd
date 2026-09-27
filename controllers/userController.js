@@ -37,7 +37,7 @@ export async function addUser(req, res) {
 
         req.session.userId = insertedUserId;
 
-        res.json({ message: "User created" });
+        res.json({isLoggedIn: true, username: username});
     } catch (error) {
         await pool.query("ROLLBACK");
         res.status(500).json({ message: "Internal Server Error" });
@@ -53,12 +53,11 @@ export async function loginUser(req, res) {
     }
 
     try {
-        const user = await pool.query('SELECT individualid, password FROM Users WHERE username = $1', [username]);
+        const user = await pool.query('SELECT individualid, username, password FROM Users WHERE username = $1', [username]);
 
         if (user.rows.length === 0) {
             return res.status(400).json({ message: "Invalid username or password" });
         }
-
 
         const validPassword = await bcrypt.compare(password, user.rows[0].password);
 
@@ -68,8 +67,15 @@ export async function loginUser(req, res) {
 
         req.session.userId = user.rows[0].individualid;
         console.log(`User ${username} ${req.session.userId} logged in successfully`);
-        res.json({ message: "Login successful" });
+        res.json({isLoggedIn: true, username: user.rows[0].username});  
     } catch (error) {
         res.status(500).json({ message: "Internal Server Error" });
     }
+}
+
+export async function authUser(req, res) {
+    if (!req.session.userId) {
+        return res.status(401).json({ message: "Not authenticated" });
+    }
+    res.json({ userId: req.session.userId });
 }
